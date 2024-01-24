@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            border: 1px solid #d3d3d3;
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+
+<body onload="startGame()">
+    <script>
+        let gamePiece;
+        let upButton;
+        let downButton;
+        let leftButton;
+        let rightButton;
+
+        function startGame() {
+            gamePiece = new component(100, 100, "red", 10, 120);
+            upButton = new component(30, 30, "blue", 50, 10);
+            downButton = new component(30, 30, "blue", 50, 70);
+            leftButton = new component(30, 30, "blue", 20, 40);
+            rightButton = new component(30, 30, "blue", 80, 40);
+            field.start();
+        }
+
+
+        const field = {
+            canvas: document.createElement("canvas"),
+            start: function () {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.context = this.canvas.getContext("2d");
+                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+                this.interval = setInterval(updateGameArea, 20);
+
+                window.addEventListener('mousedown', function (e) {
+                    field.x = e.pageX;
+                    field.y = e.pageY;
+                })
+                window.addEventListener('mouseup', function (e) {
+                    field.x = false;
+                    field.y = false;
+                })
+                window.addEventListener('touchstart', function (e) {
+                    field.x = e.pageX;
+                    field.y = e.pageY;
+                })
+                window.addEventListener('touchend', function (e) {
+                    field.x = false;
+                    field.y = false;
+                })
+            },
+            clear: function () {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+        }
+
+        function component(width, height, color, x, y) {
+            this.width = width;
+            this.height = height;
+            this.speedX = 0;
+            this.speedY = 0;
+            this.x = x;
+            this.y = y;
+
+            this.update = function () {
+                ctx = field.context;
+                ctx.fillStyle = color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+            this.clicked = function () {
+                let left = this.x;
+                let right = this.x + (this.width);
+                let top = this.y;
+                let bottom = this.y + (this.height);
+                let clicked = true;
+                if ((bottom < field.y) || (top > field.y) || (right < field.x) || (left > field.x)) {
+                    clicked = false;
+                }
+                return clicked;
+            }
+        }
+
+        function updateGameArea() {
+            field.clear();
+            if (field.x && field.y) {
+                if (upButton.clicked()) {
+                    gamePiece.y -= 1;
+                }
+                if (downButton.clicked()) {
+                    gamePiece.y += 1;
+                }
+                if (leftButton.clicked()) {
+                    gamePiece.x += -1;
+                }
+                if (rightButton.clicked()) {
+                    gamePiece.x += 1;
+                }
+            }
+            upButton.update();
+            downButton.update();
+            leftButton.update();
+            rightButton.update();
+            gamePiece.update();
+        }
+
+    </script>
+    <script src="app.js"></script>
+</body>
+
+</html>
